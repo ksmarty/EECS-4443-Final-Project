@@ -28,6 +28,11 @@ public class TestingActivity extends AppCompatActivity {
 
     VIEWS currentView;
 
+    /**
+     * Timestamp when user started the task
+     */
+    long startTime;
+
     enum VIEWS {
         KEYBOARD_TEST,
         WELCOME
@@ -71,6 +76,10 @@ public class TestingActivity extends AppCompatActivity {
 
     }
 
+    private void startTest() {
+        startTime = System.currentTimeMillis();
+    }
+
     private void continueButtonClicked(View view) {
         switch (currentView) {
             case WELCOME -> showTestScreen();
@@ -79,19 +88,22 @@ public class TestingActivity extends AppCompatActivity {
     }
 
     private void recordTest() {
-        // TODO Track time to complete
-        int completionTime = 5000;
+        int completionTime = (int) (System.currentTimeMillis() - System.currentTimeMillis());
 
         String userText = ((EditText) findViewById(R.id.testingContentBox)).getText().toString();
 
-        LevenshteinDistance levenshteinDistance = new LevenshteinDistance();
-        double userDistance = levenshteinDistance.apply(expectedText, userText);
-        double referenceDistance = levenshteinDistance.apply(expectedText, referenceText);
-        double errorRate = userDistance / referenceDistance;
+        double errorRate = getErrorRate(userText);
 
         testResults.add(new TestResult(completionTime, errorRate));
 
         printResults();
+    }
+
+    private double getErrorRate(String userText) {
+        LevenshteinDistance levenshteinDistance = new LevenshteinDistance();
+        double userDistance = levenshteinDistance.apply(expectedText, userText);
+        double referenceDistance = levenshteinDistance.apply(expectedText, referenceText);
+        return userDistance / referenceDistance;
     }
 
     private void showTestScreen() {
@@ -113,6 +125,8 @@ public class TestingActivity extends AppCompatActivity {
         spannableString.setSpan(colorSpan, startIndex, endIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         editText.setText(spannableString);
+
+        startTest();
     }
 
     private void onKeyboardVisibilityChanged(boolean opened) {
