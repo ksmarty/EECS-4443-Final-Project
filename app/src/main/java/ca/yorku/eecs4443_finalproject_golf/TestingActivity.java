@@ -1,11 +1,7 @@
 package ca.yorku.eecs4443_finalproject_golf;
 
-import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Bundle;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -14,29 +10,24 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import org.apache.commons.text.similarity.LevenshteinDistance;
-
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
+import static ca.yorku.eecs4443_finalproject_golf.R.string.test_content_1;
+import static ca.yorku.eecs4443_finalproject_golf.R.string.test_expected_1;
+import static ca.yorku.eecs4443_finalproject_golf.R.string.test_highlight_1;
+import static ca.yorku.eecs4443_finalproject_golf.TestBundle.TYPE.DIGITALINK;
+import static ca.yorku.eecs4443_finalproject_golf.TestBundle.TYPE.KEYBOARD;
+
 public class TestingActivity extends AppCompatActivity {
-
-    String expectedText;
-    String referenceText;
-
     ArrayList<TestResult> testResults;
 
     VIEWS currentView;
 
-    /**
-     * Timestamp when user started the task
-     */
-    long startTime;
+    ArrayList<TestBundle> allTests;
 
-    enum VIEWS {
-        KEYBOARD_TEST,
-        WELCOME
-    }
+    TestBundle currentTest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +35,7 @@ public class TestingActivity extends AppCompatActivity {
         setCurrentView(R.layout.activity_testing_welcome, VIEWS.WELCOME);
 
         testResults = new ArrayList<>();
+        allTests = generateTests();
 
         Bundle b = getIntent().getExtras();
         String name = b.getString(BundleKeys.NAME);
@@ -76,10 +68,6 @@ public class TestingActivity extends AppCompatActivity {
 
     }
 
-    private void startTest() {
-        startTime = System.currentTimeMillis();
-    }
-
     private void continueButtonClicked(View view) {
         switch (currentView) {
             case WELCOME -> showTestScreen();
@@ -88,22 +76,13 @@ public class TestingActivity extends AppCompatActivity {
     }
 
     private void recordTest() {
-        int completionTime = (int) (System.currentTimeMillis() - System.currentTimeMillis());
-
         String userText = ((EditText) findViewById(R.id.testingContentBox)).getText().toString();
 
-        double errorRate = getErrorRate(userText);
+        TestResult result = currentTest.complete(userText);
 
-        testResults.add(new TestResult(completionTime, errorRate));
+        testResults.add(result);
 
         printResults();
-    }
-
-    private double getErrorRate(String userText) {
-        LevenshteinDistance levenshteinDistance = new LevenshteinDistance();
-        double userDistance = levenshteinDistance.apply(expectedText, userText);
-        double referenceDistance = levenshteinDistance.apply(expectedText, referenceText);
-        return userDistance / referenceDistance;
     }
 
     private void showTestScreen() {
@@ -111,22 +90,10 @@ public class TestingActivity extends AppCompatActivity {
 
         EditText editText = findViewById(R.id.testingContentBox);
 
-        // TODO add more tests & abstract
-        referenceText = getString(R.string.test_content_1);
-        expectedText = getString(R.string.test_expected_1);
+        // Pop next test from the list
+        currentTest = allTests.remove(0);
 
-        SpannableString spannableString = new SpannableString(referenceText);
-
-        String highlightText = "potato";
-        int startIndex = referenceText.indexOf(highlightText);
-        int endIndex = startIndex + highlightText.length();
-
-        ForegroundColorSpan colorSpan = new ForegroundColorSpan(Color.RED);
-        spannableString.setSpan(colorSpan, startIndex, endIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        editText.setText(spannableString);
-
-        startTest();
+        editText.setText(currentTest.getContent());
     }
 
     private void onKeyboardVisibilityChanged(boolean opened) {
@@ -137,5 +104,18 @@ public class TestingActivity extends AppCompatActivity {
     private void printResults() {
         String prettyPrint = testResults.stream().map(TestResult::toString).collect(Collectors.joining());
         Log.i(null, prettyPrint);
+    }
+
+    private ArrayList<TestBundle> generateTests() {
+        // TODO add more tests
+        return new ArrayList<>(List.of(
+                new TestBundle(this, KEYBOARD, test_content_1, test_expected_1, test_highlight_1),
+                new TestBundle(this, DIGITALINK, test_content_1, test_expected_1, test_highlight_1)
+        ));
+    }
+
+    enum VIEWS {
+        KEYBOARD_TEST,
+        WELCOME
     }
 }
