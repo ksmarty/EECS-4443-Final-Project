@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">EECS 4443 - Final Project - Golf</string>
+    <string name="name">Name</string>
+    <string name="get_started">Get Started</string>
+    <string name="tutorial">Tutorial</string>
+    <string name="tutorial_description">You will be given a tutorial of how the two input methods work - Keyboard &amp; DigitalInk\n\nOnce you have completed a task, press the button in the bottom right corner to proceed\n\nTry pressing it now!</string>
+    <string name="setup_description">Enter your name and click \"Get Started\" to begin</string>
+    <string name="error_invalid_name">Please enter your full name!</string>
+    <string name="setup_subtitle">EECS 4443 - Final Project</string>
 </resources>
