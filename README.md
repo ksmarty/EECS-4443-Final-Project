@@ -1,5 +1,12 @@
 # EECS 4443 - Final Project
 
+## Using [Issues](https://github.com/ksmarty/EECS-4443-Final-Project/issues)
+
+- Use the labels. Makes prioritization easier
+- Assign yourself to an issue if you're working on it
+- Try and reference the issue in your PR (optional but good practice)
+- Close the issue when you're done
+
 ## Contribution Steps
 
 - Create a new branch with the name `feature/[feature-name]` or `patch/[patch-name]`
