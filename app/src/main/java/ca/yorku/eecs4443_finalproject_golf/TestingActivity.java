@@ -71,8 +71,13 @@ public class TestingActivity extends AppCompatActivity {
     private void continueButtonClicked(View view) {
         switch (currentView) {
             case WELCOME -> showTestScreen();
-            case KEYBOARD_TEST -> recordTest();
+            case KEYBOARD_TEST -> testCompleted();
         }
+    }
+
+    private void testCompleted() {
+        recordTest();
+        showTestScreen();
     }
 
     private void recordTest() {
@@ -86,12 +91,20 @@ public class TestingActivity extends AppCompatActivity {
     }
 
     private void showTestScreen() {
-        setCurrentView(R.layout.activity_testing_keyboard_test, VIEWS.KEYBOARD_TEST);
+        // Pop next test from the list
+        currentTest = allTests.remove(0);
+
+        if (currentTest.type == KEYBOARD)
+            setCurrentView(R.layout.activity_testing_keyboard_test, VIEWS.KEYBOARD_TEST);
+        else
+            setCurrentView(R.layout.activity_testing_digitalink_test, VIEWS.DIGITALINK_TEST);
 
         EditText editText = findViewById(R.id.testingContentBox);
 
-        // Pop next test from the list
-        currentTest = allTests.remove(0);
+        // Hide keyboard
+        if (currentTest.type == DIGITALINK) {
+            editText.setShowSoftInputOnFocus(false);
+        }
 
         editText.setText(currentTest.getContent());
     }
@@ -116,6 +129,7 @@ public class TestingActivity extends AppCompatActivity {
 
     enum VIEWS {
         KEYBOARD_TEST,
+        DIGITALINK_TEST,
         WELCOME
     }
 }

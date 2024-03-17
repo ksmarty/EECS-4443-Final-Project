@@ -15,9 +15,12 @@ public class TestResult {
      */
     double errorRate;
 
-    public TestResult(int time, double errorRate) {
+    TestBundle.TYPE type;
+
+    public TestResult(int time, double errorRate, TestBundle.TYPE type) {
         this.time = time;
         this.errorRate = errorRate;
+        this.type = type;
     }
 
     public int getTime() {
@@ -32,6 +35,6 @@ public class TestResult {
     @SuppressLint("DefaultLocale")
     @Override
     public String toString() {
-        return String.format("---%nTest Result:%nTime: %d ms%nError Rate: %.2f%%%n", time, errorRate * 100);
+        return String.format("---%nTest Result:%nTime: %d ms%nError Rate: %.2f%%%nType: %s", time, errorRate * 100, type.toString());
     }
 }

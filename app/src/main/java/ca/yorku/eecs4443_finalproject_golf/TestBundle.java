@@ -67,7 +67,7 @@ public class TestBundle implements Comparable<TestBundle> {
 
         double errorRate = getErrorRate(userText);
 
-        return new TestResult(completionTime, errorRate);
+        return new TestResult(completionTime, errorRate, type);
     }
 
     private double getErrorRate(String userText) {
