@@ -1,9 +1,8 @@
 package ca.yorku.eecs4443_finalproject_golf;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.LocaleList;
@@ -13,17 +12,12 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
-
 import digitalink.DrawView;
 import digitalink.StrokeManager;
 import digitalink.StrokeManager.LANG;
@@ -42,6 +36,8 @@ public class TestingActivity extends AppCompatActivity {
 
     TestBundle currentTest;
 
+    String name;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,7 +47,7 @@ public class TestingActivity extends AppCompatActivity {
         allTests = generateTests();
 
         Bundle b = getIntent().getExtras();
-        String name = b.getString(BundleKeys.NAME);
+        name = b.getString(BundleKeys.NAME);
 
         StrokeManager.init();
 
@@ -113,8 +109,22 @@ public class TestingActivity extends AppCompatActivity {
             if (currentTest.type == KEYBOARD) setupKeyboard();
             else setupDigitalInk();
         }else {
-            Log.i("DEBUG_ING", "There are no more tests");
-            //We can collect results here and generate a qr code
+            //Show results on another activity.
+            //Append new data to shared preferences.
+            StringBuilder csvBuilder = new StringBuilder();
+            for (TestResult result : testResults) {
+                csvBuilder.append(name).append(",");
+                csvBuilder.append(result.time).append(",");
+                csvBuilder.append(result.attempts).append(",");
+                csvBuilder.append(result.type).append(",");
+                csvBuilder.append(result.language).append("\n");
+            }
+            //Save data
+            SharedPref.appendAndSaveCSVData(this, csvBuilder.toString());
+            //Open Result Activity
+            Intent intent = new Intent(this, ResultActivity.class);
+            startActivity(intent);
+            this.finish(); //Close current activity.
         }
     }
 
@@ -182,7 +192,6 @@ public class TestingActivity extends AppCompatActivity {
     private void printResults() {
         String prettyPrint = testResults.stream().map(TestResult::toString).collect(Collectors.joining());
         Log.i(null, prettyPrint);
-        Toast.makeText(this, prettyPrint, Toast.LENGTH_LONG).show();
     }
 
     private ArrayList<TestBundle> generateTests() {
