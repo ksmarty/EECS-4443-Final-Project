@@ -1,7 +1,9 @@
 package ca.yorku.eecs4443_finalproject_golf;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.LocaleList;
@@ -11,6 +13,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -25,6 +28,7 @@ import digitalink.DrawView;
 import digitalink.StrokeManager;
 import digitalink.StrokeManager.LANG;
 
+import static ca.yorku.eecs4443_finalproject_golf.R.string.test_content_0;
 import static ca.yorku.eecs4443_finalproject_golf.R.string.test_content_1;
 import static ca.yorku.eecs4443_finalproject_golf.TestBundle.TYPE.DIGITALINK;
 import static ca.yorku.eecs4443_finalproject_golf.TestBundle.TYPE.KEYBOARD;
@@ -82,7 +86,7 @@ public class TestingActivity extends AppCompatActivity {
     private void continueButtonClicked(View view) {
         switch (currentView) {
             case WELCOME -> showTestScreen();
-            case KEYBOARD_TEST -> testCompleted();
+            case KEYBOARD_TEST, DIGITALINK_TEST -> testCompleted();
         }
     }
 
@@ -104,10 +108,14 @@ public class TestingActivity extends AppCompatActivity {
 
     private void showTestScreen() {
         // Pop next test from the list
-        currentTest = allTests.remove(0);
-
-        if (currentTest.type == KEYBOARD) setupKeyboard();
-        else setupDigitalInk();
+        if(!allTests.isEmpty()){
+            currentTest = allTests.remove(0);
+            if (currentTest.type == KEYBOARD) setupKeyboard();
+            else setupDigitalInk();
+        }else {
+            Log.i("DEBUG_ING", "There are no more tests");
+            //We can collect results here and generate a qr code
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -174,11 +182,14 @@ public class TestingActivity extends AppCompatActivity {
     private void printResults() {
         String prettyPrint = testResults.stream().map(TestResult::toString).collect(Collectors.joining());
         Log.i(null, prettyPrint);
+        Toast.makeText(this, prettyPrint, Toast.LENGTH_LONG).show();
     }
 
     private ArrayList<TestBundle> generateTests() {
         // TODO add more tests
         return new ArrayList<>(List.of(
+                new TestBundle(this, KEYBOARD, test_content_0, LANG.ENGLISH),
+                new TestBundle(this, DIGITALINK, test_content_0, LANG.ENGLISH),
                 new TestBundle(this, KEYBOARD, test_content_1, LANG.CHINESE),
                 new TestBundle(this, DIGITALINK, test_content_1, LANG.CHINESE)
         ));
