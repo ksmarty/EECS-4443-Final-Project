@@ -2,5 +2,6 @@
 <resources>
     <string name="test_instructions_digital_ink">Draw the target input in the box and click \"Recognize\"</string>
     <string name="test_instructions_keyboard">Type the target input in the box</string>
+    <string name="test_content_0">Test</string>
     <string name="test_content_1">好</string>
 </resources>
