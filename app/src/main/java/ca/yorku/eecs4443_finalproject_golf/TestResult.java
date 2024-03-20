@@ -4,34 +4,41 @@ import android.annotation.SuppressLint;
 
 import androidx.annotation.NonNull;
 
+import static ca.yorku.eecs4443_finalproject_golf.TestBundle.TYPE;
+import static digitalink.StrokeManager.LANG;
+
 public class TestResult {
-   /**
-    * Time to complete in ms
-    */
-   int time;
+    /**
+     * Time to complete in ms
+     */
+    int time;
 
-   /**
-    * levenshteinDistance(expected, user) / levenshteinDistance(expected, original)
-    */
-   double errorRate;
+    /**
+     * Number of attempts made
+     */
+    int attempts;
 
-   public TestResult(int time, double errorRate) {
-      this.time = time;
-      this.errorRate = errorRate;
-   }
+    /**
+     * Type of test - Keyboard or Digital Ink
+     */
+    TYPE type;
 
-   public int getTime() {
-      return time;
-   }
+    /**
+     * Test language
+     */
+    LANG language;
 
-   public double getErrorRate() {
-      return errorRate;
-   }
+    public TestResult(int time, int attempts, TYPE type, LANG language) {
+        this.time = time;
+        this.attempts = attempts;
+        this.type = type;
+        this.language = language;
+    }
 
-   @NonNull
-   @SuppressLint("DefaultLocale")
-   @Override
-   public String toString() {
-      return String.format("---%nTest Result:%nTime: %d ms%nError Rate: %.2f%%%n", time, errorRate);
-   }
+    @NonNull
+    @SuppressLint("DefaultLocale")
+    @Override
+    public String toString() {
+        return String.format("---%nTest Result:%nTime: %d ms%nAttempts: %d%nType: %s%nLanguage: %s", time, attempts, type.toString(), language.toString());
+    }
 }
