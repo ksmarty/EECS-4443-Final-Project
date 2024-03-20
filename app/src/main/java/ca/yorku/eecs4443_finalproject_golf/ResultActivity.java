@@ -28,10 +28,9 @@ public class ResultActivity extends AppCompatActivity {
 
 
         String results = SharedPref.getCSVData(this);
-        String[] list_result = results.split("\n");
-        for (int i = 0;i<list_result.length;i++){
-            list_result[i] = list_result[i].replace(",", "\t\t");
-        }
+        String[] list_result = Arrays.stream(results.split("\n"))
+            .map(line -> line.replace(",", "\t\t"))
+            .toArray(String[]::new);
         lsResults.setAdapter(
                 new ArrayAdapter<String>(
                         this,
