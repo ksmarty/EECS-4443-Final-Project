@@ -21,6 +21,10 @@ public class SetupActivity extends AppCompatActivity {
         // Show results activity
         Button btnShowResults = (Button) findViewById(R.id.btn_show_results);
         btnShowResults.setOnClickListener(v -> startActivity(new Intent(SetupActivity.this, ResultActivity.class)));
+
+        // Hide "Show Results" if there are none
+        if (!SharedPref.hasSavedData(this))
+            btnShowResults.setVisibility(View.GONE);
     }
 
     private void getStarted(View v) {

@@ -8,6 +8,7 @@
     <string name="error_invalid_name">Please enter your full name!</string>
     <string name="setup_subtitle">EECS 4443 - Final Project</string>
     <string name="clear_button_text">Clear</string>
+    <string name="clear_results_button_text">Clear Results</string>
     <string name="target_input_label">Target Input</string>
     <string name="user_input_label">Your Input</string>
     <string name="recognize">Recognize</string>
