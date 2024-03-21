@@ -41,4 +41,8 @@ public class TestResult {
     public String toString() {
         return String.format("---%nTest Result:%nTime: %d ms%nAttempts: %d%nType: %s%nLanguage: %s", time, attempts, type.toString(), language.toString());
     }
+
+    public String toCSV(String name) {
+        return String.format("%s,%s,%s,%s,%s%n", name, time, attempts, type, language);
+    }
 }

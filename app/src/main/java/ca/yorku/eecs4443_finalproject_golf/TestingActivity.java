@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.LocaleList;
 import android.util.Log;
@@ -12,16 +13,21 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
+
 import digitalink.DrawView;
 import digitalink.StrokeManager;
 import digitalink.StrokeManager.LANG;
 
+import static android.os.BatteryManager.BATTERY_PROPERTY_ENERGY_COUNTER;
 import static ca.yorku.eecs4443_finalproject_golf.R.string.test_content_0;
 import static ca.yorku.eecs4443_finalproject_golf.R.string.test_content_1;
 import static ca.yorku.eecs4443_finalproject_golf.TestBundle.TYPE.DIGITALINK;
@@ -87,6 +93,7 @@ public class TestingActivity extends AppCompatActivity {
     }
 
     private void testCompleted() {
+        batteryInfo();
         recordTest();
         showTestScreen();
     }
@@ -103,29 +110,27 @@ public class TestingActivity extends AppCompatActivity {
     }
 
     private void showTestScreen() {
-        // Pop next test from the list
-        if(!allTests.isEmpty()){
-            currentTest = allTests.remove(0);
-            if (currentTest.type == KEYBOARD) setupKeyboard();
-            else setupDigitalInk();
-        }else {
-            //Show results on another activity.
-            //Append new data to shared preferences.
-            StringBuilder csvBuilder = new StringBuilder();
-            for (TestResult result : testResults) {
-                csvBuilder.append(name).append(",");
-                csvBuilder.append(result.time).append(",");
-                csvBuilder.append(result.attempts).append(",");
-                csvBuilder.append(result.type).append(",");
-                csvBuilder.append(result.language).append("\n");
-            }
-            //Save data
-            SharedPref.appendAndSaveCSVData(this, csvBuilder.toString());
-            //Open Result Activity
-            Intent intent = new Intent(this, ResultActivity.class);
-            startActivity(intent);
-            this.finish(); //Close current activity.
+        // Show results screen
+        if (allTests.isEmpty()) {
+            allTestsCompleted();
+            return;
         }
+
+        // Pop next test from the list
+        currentTest = allTests.remove(0);
+        if (currentTest.type == KEYBOARD) setupKeyboard();
+        else setupDigitalInk();
+    }
+
+    private void allTestsCompleted() {
+        // Create CSV data
+        String csv = testResults.stream().map(e -> e.toCSV(name)).collect(Collectors.joining());
+        // Save data
+        SharedPref.appendAndSaveCSVData(this, csv);
+        // Open Result Activity
+        Intent intent = new Intent(this, ResultActivity.class);
+        startActivity(intent);
+        this.finish(); // Close current activity.
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -202,6 +207,15 @@ public class TestingActivity extends AppCompatActivity {
                 new TestBundle(this, KEYBOARD, test_content_1, LANG.CHINESE),
                 new TestBundle(this, DIGITALINK, test_content_1, LANG.CHINESE)
         ));
+    }
+
+    public void batteryInfo() {
+        // Get an instance of the BatteryManager service
+        BatteryManager batteryManager = (BatteryManager) getSystemService(BATTERY_SERVICE);
+
+        long batteryRemaining = batteryManager.getLongProperty(BATTERY_PROPERTY_ENERGY_COUNTER);
+
+        Log.i("Battery", String.valueOf(batteryRemaining));
     }
 
     enum VIEWS {
