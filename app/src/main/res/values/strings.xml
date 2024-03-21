@@ -11,4 +11,5 @@
     <string name="target_input_label">Target Input</string>
     <string name="user_input_label">Your Input</string>
     <string name="recognize">Recognize</string>
+    <string name="show_results">Show Results</string>
 </resources>
