@@ -3,7 +3,6 @@ package ca.yorku.eecs4443_finalproject_golf;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.LocaleList;
 import android.util.Log;
@@ -12,12 +11,14 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
+
 import digitalink.DrawView;
 import digitalink.StrokeManager;
 import digitalink.StrokeManager.LANG;
@@ -47,11 +48,11 @@ public class TestingActivity extends AppCompatActivity {
         allTests = generateTests();
 
         Bundle b = getIntent().getExtras();
-        name = b.getString(BundleKeys.NAME);
+        name = b != null ? b.getString(BundleKeys.NAME) : "";
 
         StrokeManager.init();
 
-        setupKeyboardListener();
+        // setupKeyboardListener();
     }
 
     private void setCurrentView(int contentView, VIEWS view) {
@@ -59,24 +60,6 @@ public class TestingActivity extends AppCompatActivity {
         setContentView(contentView);
 
         findViewById(R.id.testingContinueButton).setOnClickListener(this::continueButtonClicked);
-    }
-
-    /**
-     * Modified from <a href="https://stackoverflow.com/a/26964010">Brownsoo Han on Stack Overflow</a>
-     */
-    private void setupKeyboardListener() {
-        View rootView = findViewById(android.R.id.content);
-        rootView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
-            Rect r = new Rect();
-            rootView.getWindowVisibleDisplayFrame(r);
-            int screenHeight = rootView.getRootView().getHeight();
-            int keypadHeight = screenHeight - r.bottom;
-
-            boolean isKeyboardShowing = keypadHeight > screenHeight * 0.15;
-
-            onKeyboardVisibilityChanged(isKeyboardShowing);
-        });
-
     }
 
     private void continueButtonClicked(View view) {
@@ -99,33 +82,34 @@ public class TestingActivity extends AppCompatActivity {
 
         testResults.add(result);
 
-        printResults();
+        logResults();
     }
 
     private void showTestScreen() {
-        // Pop next test from the list
-        if(!allTests.isEmpty()){
-            currentTest = allTests.remove(0);
-            if (currentTest.type == KEYBOARD) setupKeyboard();
-            else setupDigitalInk();
-        }else {
-            //Show results on another activity.
-            //Append new data to shared preferences.
-            StringBuilder csvBuilder = new StringBuilder();
-            for (TestResult result : testResults) {
-                csvBuilder.append(name).append(",");
-                csvBuilder.append(result.time).append(",");
-                csvBuilder.append(result.attempts).append(",");
-                csvBuilder.append(result.type).append(",");
-                csvBuilder.append(result.language).append("\n");
-            }
-            //Save data
-            SharedPref.appendAndSaveCSVData(this, csvBuilder.toString());
-            //Open Result Activity
-            Intent intent = new Intent(this, ResultActivity.class);
-            startActivity(intent);
-            this.finish(); //Close current activity.
+        // Show results screen
+        if (allTests.isEmpty()) {
+            allTestsCompleted();
+            return;
         }
+
+        // Pop next test from the list
+        currentTest = allTests.remove(0);
+        currentTest.start();
+        if (currentTest.type == KEYBOARD) setupKeyboard();
+        else setupDigitalInk();
+    }
+
+    private void allTestsCompleted() {
+        // Create CSV data
+        String csv = testResults.stream().map(e -> e.toCSV(name)).collect(Collectors.joining());
+
+        // Save data
+        SharedPref.appendAndSaveCSVData(this, csv);
+
+        // Open Result Activity
+        Intent intent = new Intent(this, ResultActivity.class);
+        startActivity(intent);
+        this.finish(); // Close current activity.
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -143,6 +127,8 @@ public class TestingActivity extends AppCompatActivity {
 
         targetInput.setText(currentTest.referenceText);
         instructions.setText(R.string.test_instructions_digital_ink);
+
+        StrokeManager.clear();
 
         // Setup clear button
         clearButton.setOnClickListener(view -> {
@@ -184,12 +170,7 @@ public class TestingActivity extends AppCompatActivity {
         };
     }
 
-    private void onKeyboardVisibilityChanged(boolean opened) {
-        FloatingActionButton button = findViewById(R.id.testingContinueButton);
-        button.setVisibility(opened ? View.GONE : View.VISIBLE);
-    }
-
-    private void printResults() {
+    private void logResults() {
         String prettyPrint = testResults.stream().map(TestResult::toString).collect(Collectors.joining());
         Log.i(null, prettyPrint);
     }

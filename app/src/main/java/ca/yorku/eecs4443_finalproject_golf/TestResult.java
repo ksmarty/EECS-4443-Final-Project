@@ -11,7 +11,7 @@ public class TestResult {
     /**
      * Time to complete in ms
      */
-    int time;
+    long time;
 
     /**
      * Number of attempts made
@@ -28,11 +28,17 @@ public class TestResult {
      */
     LANG language;
 
-    public TestResult(int time, int attempts, TYPE type, LANG language) {
+    /**
+     * CPU time in ms
+     */
+    long cpuTime;
+
+    public TestResult(long time, int attempts, TYPE type, LANG language, long cpuTime) {
         this.time = time;
         this.attempts = attempts;
         this.type = type;
         this.language = language;
+        this.cpuTime = cpuTime;
     }
 
     @NonNull
@@ -40,5 +46,9 @@ public class TestResult {
     @Override
     public String toString() {
         return String.format("---%nTest Result:%nTime: %d ms%nAttempts: %d%nType: %s%nLanguage: %s", time, attempts, type.toString(), language.toString());
+    }
+
+    public String toCSV(String name) {
+        return String.format("%s,%s,%s,%s,%s,%s%n", name, time, attempts, type, language, cpuTime);
     }
 }

@@ -48,4 +48,7 @@ public class SharedPref {
         saveCSVData(context, "");
     }
 
+    public static boolean hasSavedData(Context context) {
+        return getCSVData(context).length() > 0;
+    }
 }
