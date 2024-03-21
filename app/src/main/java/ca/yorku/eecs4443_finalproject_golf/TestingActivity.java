@@ -3,8 +3,6 @@ package ca.yorku.eecs4443_finalproject_golf;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Rect;
-import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.LocaleList;
 import android.util.Log;
@@ -16,8 +14,6 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -27,7 +23,6 @@ import digitalink.DrawView;
 import digitalink.StrokeManager;
 import digitalink.StrokeManager.LANG;
 
-import static android.os.BatteryManager.BATTERY_PROPERTY_ENERGY_COUNTER;
 import static ca.yorku.eecs4443_finalproject_golf.R.string.test_content_0;
 import static ca.yorku.eecs4443_finalproject_golf.R.string.test_content_1;
 import static ca.yorku.eecs4443_finalproject_golf.TestBundle.TYPE.DIGITALINK;
@@ -53,11 +48,11 @@ public class TestingActivity extends AppCompatActivity {
         allTests = generateTests();
 
         Bundle b = getIntent().getExtras();
-        name = b.getString(BundleKeys.NAME);
+        name = b != null ? b.getString(BundleKeys.NAME) : "";
 
         StrokeManager.init();
 
-        setupKeyboardListener();
+        // setupKeyboardListener();
     }
 
     private void setCurrentView(int contentView, VIEWS view) {
@@ -65,24 +60,6 @@ public class TestingActivity extends AppCompatActivity {
         setContentView(contentView);
 
         findViewById(R.id.testingContinueButton).setOnClickListener(this::continueButtonClicked);
-    }
-
-    /**
-     * Modified from <a href="https://stackoverflow.com/a/26964010">Brownsoo Han on Stack Overflow</a>
-     */
-    private void setupKeyboardListener() {
-        View rootView = findViewById(android.R.id.content);
-        rootView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
-            Rect r = new Rect();
-            rootView.getWindowVisibleDisplayFrame(r);
-            int screenHeight = rootView.getRootView().getHeight();
-            int keypadHeight = screenHeight - r.bottom;
-
-            boolean isKeyboardShowing = keypadHeight > screenHeight * 0.15;
-
-            onKeyboardVisibilityChanged(isKeyboardShowing);
-        });
-
     }
 
     private void continueButtonClicked(View view) {
@@ -93,7 +70,6 @@ public class TestingActivity extends AppCompatActivity {
     }
 
     private void testCompleted() {
-        batteryInfo();
         recordTest();
         showTestScreen();
     }
@@ -106,7 +82,7 @@ public class TestingActivity extends AppCompatActivity {
 
         testResults.add(result);
 
-        printResults();
+        logResults();
     }
 
     private void showTestScreen() {
@@ -118,6 +94,7 @@ public class TestingActivity extends AppCompatActivity {
 
         // Pop next test from the list
         currentTest = allTests.remove(0);
+        currentTest.start();
         if (currentTest.type == KEYBOARD) setupKeyboard();
         else setupDigitalInk();
     }
@@ -125,8 +102,10 @@ public class TestingActivity extends AppCompatActivity {
     private void allTestsCompleted() {
         // Create CSV data
         String csv = testResults.stream().map(e -> e.toCSV(name)).collect(Collectors.joining());
+
         // Save data
         SharedPref.appendAndSaveCSVData(this, csv);
+
         // Open Result Activity
         Intent intent = new Intent(this, ResultActivity.class);
         startActivity(intent);
@@ -148,6 +127,8 @@ public class TestingActivity extends AppCompatActivity {
 
         targetInput.setText(currentTest.referenceText);
         instructions.setText(R.string.test_instructions_digital_ink);
+
+        StrokeManager.clear();
 
         // Setup clear button
         clearButton.setOnClickListener(view -> {
@@ -189,12 +170,7 @@ public class TestingActivity extends AppCompatActivity {
         };
     }
 
-    private void onKeyboardVisibilityChanged(boolean opened) {
-        FloatingActionButton button = findViewById(R.id.testingContinueButton);
-        button.setVisibility(opened ? View.GONE : View.VISIBLE);
-    }
-
-    private void printResults() {
+    private void logResults() {
         String prettyPrint = testResults.stream().map(TestResult::toString).collect(Collectors.joining());
         Log.i(null, prettyPrint);
     }
@@ -207,15 +183,6 @@ public class TestingActivity extends AppCompatActivity {
                 new TestBundle(this, KEYBOARD, test_content_1, LANG.CHINESE),
                 new TestBundle(this, DIGITALINK, test_content_1, LANG.CHINESE)
         ));
-    }
-
-    public void batteryInfo() {
-        // Get an instance of the BatteryManager service
-        BatteryManager batteryManager = (BatteryManager) getSystemService(BATTERY_SERVICE);
-
-        long batteryRemaining = batteryManager.getLongProperty(BATTERY_PROPERTY_ENERGY_COUNTER);
-
-        Log.i("Battery", String.valueOf(batteryRemaining));
     }
 
     enum VIEWS {
