@@ -1,5 +1,4 @@
 package ca.yorku.eecs4443_finalproject_golf;
-
 import androidx.appcompat.app.AppCompatActivity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -63,6 +62,7 @@ public class ResultActivity extends AppCompatActivity {
         String[] list_result = Arrays.stream(results.split("\n"))
                 .map(line -> line.replace(",", "\t\t"))
                 .toArray(String[]::new);
+
         lsResults.setAdapter(
                 new ArrayAdapter<String>(
                         this,
