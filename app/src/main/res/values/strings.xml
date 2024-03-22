@@ -4,7 +4,7 @@
     <string name="get_started">Get Started</string>
     <string name="tutorial">Tutorial</string>
     <string name="tutorial_description">You will be given a tutorial of how the two input methods work - Keyboard &amp; DigitalInk\n\nOnce you have completed a task, press the button in the bottom right corner to proceed\n\nTry pressing it now!</string>
-    <string name="setup_description">Enter your name and click \"Get Started\" to begin</string>
+    <string name="setup_description">Fill out the details and click \"Get Started\" to begin</string>
     <string name="error_invalid_name">Please enter your full name!</string>
     <string name="setup_subtitle">EECS 4443 - Final Project</string>
     <string name="clear_button_text">Clear</string>
@@ -15,4 +15,18 @@
     <string name="test_results">Test Results</string>
     <string name="qr_code_description">QR Code containing CSV of test results</string>
     <string name="show_results">Show Results</string>
+    <string name="welcome">Welcome</string>
+    <string name="age">Age</string>
+    <string name="experience">Experience</string>
+    <string name="gender">Gender</string>
+    <string-array name="gender">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="experience">
+        <item>Novice</item>
+        <item>Competent</item>
+        <item>Expert</item>
+    </string-array>
 </resources>

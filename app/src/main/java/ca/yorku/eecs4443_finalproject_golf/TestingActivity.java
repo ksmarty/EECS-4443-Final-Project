@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ public class TestingActivity extends AppCompatActivity {
 
     TestBundle currentTest;
 
-    String name;
+    Bundle bundle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +48,7 @@ public class TestingActivity extends AppCompatActivity {
         testResults = new ArrayList<>();
         allTests = generateTests();
 
-        Bundle b = getIntent().getExtras();
-        name = b != null ? b.getString(BundleKeys.NAME) : "";
+        bundle = getIntent().getExtras();
 
         StrokeManager.init();
 
@@ -100,8 +100,11 @@ public class TestingActivity extends AppCompatActivity {
     }
 
     private void allTestsCompleted() {
+        // User data
+        String userData = getUserData();
+
         // Create CSV data
-        String csv = testResults.stream().map(e -> e.toCSV(name)).collect(Collectors.joining());
+        String csv = userData.concat(testResults.stream().map(TestResult::toCSV).collect(Collectors.joining()));
 
         // Save data
         SharedPref.appendAndSaveCSVData(this, csv);
@@ -110,6 +113,15 @@ public class TestingActivity extends AppCompatActivity {
         Intent intent = new Intent(this, ResultActivity.class);
         startActivity(intent);
         this.finish(); // Close current activity.
+    }
+
+    @NonNull
+    private String getUserData() {
+        String name = bundle.getString(BundleKeys.NAME, "UNKNOWN_NAME");
+        int age = bundle.getInt(BundleKeys.AGE, 0);
+        String gender = bundle.getString(BundleKeys.GENDER, "UNKNOWN_GENDER");
+        String experience = bundle.getString(BundleKeys.EXPERIENCE, "UNKNOWN_EXPERIENCE");
+        return String.format("%s,%s,%s,%s%n", name, age, gender, experience);
     }
 
     @SuppressLint("ClickableViewAccessibility")

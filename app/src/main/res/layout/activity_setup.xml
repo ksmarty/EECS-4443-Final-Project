@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:text="Welcome"
+        android:text="@string/welcome"
         android:textAppearance="@style/TextAppearance.AppCompat.Display2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -65,35 +65,22 @@
         android:id="@+id/setupInputsContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="32dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/setupSubtitleContainer"
-        app:layout_constraintVertical_bias="0.1">
+        app:layout_constraintTop_toBottomOf="@+id/setupSubtitleContainer">
 
-        <Button
-            android:id="@+id/getStartedButton"
-            android:layout_width="0dp"
+        <EditText
+            android:id="@+id/ageField"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="@string/get_started"
+            android:layout_marginTop="16dp"
+            android:autofillHints="age"
+            android:ems="10"
+            android:inputType="number"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/nameField" />
-
-        <Button
-            android:id="@+id/btn_show_results"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="128dp"
-            android:text="@string/show_results"
-            android:textSize="15sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/getStartedButton" />
 
         <EditText
             android:id="@+id/nameField"
@@ -101,13 +88,91 @@
             android:layout_height="48dp"
             android:autofillHints="name"
             android:ems="10"
-            android:hint="@string/name"
             android:inputType="text"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="LabelFor" />
+
+        <Spinner
+            android:id="@+id/experienceSelect"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="16dp"
+            android:entries="@array/experience"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/genderSelect"
+            app:layout_constraintTop_toBottomOf="@+id/genderSelect" />
+
+        <Spinner
+            android:id="@+id/genderSelect"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="16dp"
+            android:entries="@array/gender"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/ageField"
+            app:layout_constraintTop_toBottomOf="@+id/ageField" />
+
+        <TextView
+            android:id="@+id/nameLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:text="@string/name"
+            app:layout_constraintBottom_toBottomOf="@+id/nameField"
+            app:layout_constraintEnd_toStartOf="@+id/nameField"
+            app:layout_constraintTop_toTopOf="@+id/nameField" />
+
+        <TextView
+            android:id="@+id/ageLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/age"
+            app:layout_constraintBottom_toBottomOf="@+id/ageField"
+            app:layout_constraintEnd_toEndOf="@+id/nameLabel"
+            app:layout_constraintTop_toTopOf="@+id/ageField" />
+
+        <TextView
+            android:id="@+id/genderLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/gender"
+            app:layout_constraintBottom_toBottomOf="@+id/genderSelect"
+            app:layout_constraintEnd_toEndOf="@+id/ageLabel"
+            app:layout_constraintTop_toTopOf="@+id/genderSelect" />
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/experience"
+            app:layout_constraintBottom_toBottomOf="@+id/experienceSelect"
+            app:layout_constraintEnd_toEndOf="@+id/genderLabel"
+            app:layout_constraintTop_toTopOf="@+id/experienceSelect" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <Button
+        android:id="@+id/btn_show_results"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/show_results"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/getStartedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="32dp"
+        android:text="@string/get_started"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/setupInputsContainer" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
