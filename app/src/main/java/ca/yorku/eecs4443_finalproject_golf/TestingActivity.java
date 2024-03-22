@@ -1,6 +1,7 @@
 package ca.yorku.eecs4443_finalproject_golf;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -30,6 +31,8 @@ import static ca.yorku.eecs4443_finalproject_golf.TestBundle.TYPE.DIGITALINK;
 import static ca.yorku.eecs4443_finalproject_golf.TestBundle.TYPE.KEYBOARD;
 
 public class TestingActivity extends AppCompatActivity {
+    final int MAX_ATTEMPTS = 3;
+
     ArrayList<TestResult> testResults;
 
     VIEWS currentView;
@@ -39,6 +42,8 @@ public class TestingActivity extends AppCompatActivity {
     TestBundle currentTest;
 
     Bundle bundle;
+
+    private int attempts = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,15 +75,58 @@ public class TestingActivity extends AppCompatActivity {
     }
 
     private void testCompleted() {
+        if(attempts < MAX_ATTEMPTS && !checkCorrectness()){
+            attempts++;
+            clearInputs();
+            return;
+        }
         recordTest();
         showTestScreen();
     }
 
+
+    private boolean checkCorrectness() {
+        switch (currentView) {
+            case KEYBOARD_TEST -> {
+                TextView targetInput = findViewById(R.id.targetInput);
+                EditText userInput = findViewById(R.id.userInput);
+                return targetInput.getText().toString().equals(userInput.getText().toString());
+            }
+            case DIGITALINK_TEST -> {
+                TextView targetInput = findViewById(R.id.targetInput);
+                TextView input = findViewById(R.id.userInput);
+                return targetInput.getText().toString().equals(input.getText().toString());
+            }
+        }
+        return false;
+    }
+
+    private void clearInputs() {
+        switch (currentView) {
+            case DIGITALINK_TEST:
+                TextView digitalInkUserInput = findViewById(R.id.userInput);
+                DrawView drawView = findViewById(R.id.draw_view);
+                if (digitalInkUserInput != null && drawView != null) {
+                    digitalInkUserInput.setText("");
+                    StrokeManager.clear();
+                    drawView.clear();
+                }
+                break;
+            case KEYBOARD_TEST:
+                EditText keyboardInput = findViewById(R.id.userInput);
+                if (keyboardInput != null) {
+                    keyboardInput.setText("");
+                }
+                break;
+        }
+    }
+
+
     private void recordTest() {
-        // TODO implement attempts
-        int attempts = 1;
 
         TestResult result = currentTest.complete(attempts);
+
+        attempts = 1;
 
         testResults.add(result);
 
@@ -126,6 +174,8 @@ public class TestingActivity extends AppCompatActivity {
 
     @SuppressLint("ClickableViewAccessibility")
     private void setupDigitalInk() {
+        hideKeyboard(this); //Fix if keyboard still on screen.
+
         setCurrentView(R.layout.activity_testing_digitalink_test, VIEWS.DIGITALINK_TEST);
 
         StrokeManager.setModel(currentTest.language);
@@ -195,6 +245,13 @@ public class TestingActivity extends AppCompatActivity {
                 new TestBundle(this, KEYBOARD, test_content_1, LANG.CHINESE),
                 new TestBundle(this, DIGITALINK, test_content_1, LANG.CHINESE)
         ));
+    }
+
+    private void hideKeyboard(Activity activity) {
+        View view = activity.getCurrentFocus();
+        if (view == null) return;
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     enum VIEWS {
