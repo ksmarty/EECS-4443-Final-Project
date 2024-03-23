@@ -45,6 +45,9 @@ public class TestingActivity extends AppCompatActivity {
 
     private int attempts = 1;
 
+
+    NonDeletableEditTextWatcher nonDeletableEditTextWatcher;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,10 +116,11 @@ public class TestingActivity extends AppCompatActivity {
                 }
                 break;
             case KEYBOARD_TEST:
-                EditText keyboardInput = findViewById(R.id.userInput);
-                if (keyboardInput != null) {
-                    keyboardInput.setText("");
+                if(nonDeletableEditTextWatcher == null) { //From current contentView
+                    EditText inputUser = (EditText) findViewById(R.id.userInput);
+                    nonDeletableEditTextWatcher = new NonDeletableEditTextWatcher(inputUser);
                 }
+                nonDeletableEditTextWatcher.clear(); //Clear input data on every attempt
                 break;
         }
     }
@@ -190,6 +194,8 @@ public class TestingActivity extends AppCompatActivity {
         targetInput.setText(currentTest.referenceText);
         instructions.setText(R.string.test_instructions_digital_ink);
 
+        clearButton.setVisibility(View.INVISIBLE);
+
         StrokeManager.clear();
 
         // Setup clear button
@@ -208,7 +214,7 @@ public class TestingActivity extends AppCompatActivity {
         TextView targetInput = findViewById(R.id.targetInput);
         TextView instructions = findViewById(R.id.testInstructions);
         EditText userInput = findViewById(R.id.userInput);
-
+        nonDeletableEditTextWatcher = new NonDeletableEditTextWatcher(userInput);//Setup from a new contentView
         targetInput.setText(currentTest.referenceText);
         instructions.setText(R.string.test_instructions_keyboard);
 
