@@ -19,6 +19,7 @@
     <string name="age">Age</string>
     <string name="experience">Experience</string>
     <string name="gender">Gender</string>
+    <string name="loading">Loading…</string>
     <string-array name="gender">
         <item>Male</item>
         <item>Female</item>

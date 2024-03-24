@@ -2,6 +2,7 @@ package ca.yorku.eecs4443_finalproject_golf;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.LocaleList;
 import android.text.InputType;
 import android.view.View;
@@ -16,6 +17,7 @@ import java.util.Locale;
 
 import digitalink.StrokeManager;
 
+import static digitalink.StrokeManager.allModelsDownloaded;
 import static digitalink.StrokeManager.getLanguage;
 
 public class SetupActivity extends AppCompatActivity {
@@ -39,6 +41,23 @@ public class SetupActivity extends AppCompatActivity {
         setupAgeField();
 
         setupTextFields();
+
+        StrokeManager.init();
+
+        Handler handler = new Handler();
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                if (!allModelsDownloaded()) {
+                    // Call the handler recursively after a delay
+                    handler.postDelayed(this, 1000); // Delay of 1 second
+                } else {
+                    doneLoading();
+                }
+            }
+        };
+
+        handler.postDelayed(runnable, 1000); // Delay of 1 second
     }
 
     private void setupTextFields() {
@@ -96,5 +115,11 @@ public class SetupActivity extends AppCompatActivity {
         Intent i = new Intent(this, TestingActivity.class);
         i.putExtras(b);
         startActivity(i);
+    }
+
+    public void doneLoading() {
+        Button button = findViewById(R.id.getStartedButton);
+        button.setEnabled(true);
+        button.setText(R.string.get_started);
     }
 }
