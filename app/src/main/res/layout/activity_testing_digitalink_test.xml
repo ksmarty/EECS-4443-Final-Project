@@ -46,11 +46,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/userInput" />
 
-    <TextView
+    <EditText
         android:id="@+id/userInput"
-        android:layout_width="wrap_content"
+        android:layout_width="128dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
+        android:focusable="false"
+        android:gravity="center"
+        android:inputType="none"
         android:textAppearance="@style/TextAppearance.AppCompat.Display2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline"
