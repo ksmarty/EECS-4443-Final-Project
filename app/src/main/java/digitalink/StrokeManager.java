@@ -71,8 +71,11 @@ public class StrokeManager {
     @Contract(pure = true)
     public static String getLanguage(@NonNull LANG lang) {
         return switch (lang) {
-            case CHINESE -> "zh-Hani";
             case ENGLISH -> "en";
+            case GEORGIAN -> "ka";
+            case GREEK -> "el";
+            case ARMENIAN -> "hy";
+            case UKRAINIAN -> "uk";
         };
     }
 
@@ -102,12 +105,20 @@ public class StrokeManager {
                 .addOnFailureListener(e -> Log.e(TAG, "Error during recognition: " + e));
     }
 
+    public static boolean hasStrokes() {
+        return inkBuilder.build().getStrokes().size() > 0;
+    }
+
     public static void clear() {
         inkBuilder = Ink.builder();
     }
 
     public enum LANG {
-        CHINESE,
-        ENGLISH
+        ENGLISH,
+        GEORGIAN,
+        GREEK,
+        ARMENIAN,
+        UKRAINIAN
+
     }
 }

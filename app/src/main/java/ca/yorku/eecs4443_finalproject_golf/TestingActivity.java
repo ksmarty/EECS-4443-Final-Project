@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.LocaleList;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -27,8 +29,12 @@ import digitalink.StrokeManager.LANG;
 
 import static ca.yorku.eecs4443_finalproject_golf.R.string.test_content_0;
 import static ca.yorku.eecs4443_finalproject_golf.R.string.test_content_1;
+import static ca.yorku.eecs4443_finalproject_golf.R.string.test_content_2;
+import static ca.yorku.eecs4443_finalproject_golf.R.string.test_content_3;
+import static ca.yorku.eecs4443_finalproject_golf.R.string.test_content_4;
 import static ca.yorku.eecs4443_finalproject_golf.TestBundle.TYPE.DIGITALINK;
 import static ca.yorku.eecs4443_finalproject_golf.TestBundle.TYPE.KEYBOARD;
+import static digitalink.StrokeManager.getLanguage;
 
 public class TestingActivity extends AppCompatActivity {
     final int MAX_ATTEMPTS = 3;
@@ -42,11 +48,7 @@ public class TestingActivity extends AppCompatActivity {
     TestBundle currentTest;
 
     Bundle bundle;
-
-    private int attempts = 1;
-
-
-    NonDeletableEditTextWatcher nonDeletableEditTextWatcher;
+    private int attempts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +61,6 @@ public class TestingActivity extends AppCompatActivity {
         bundle = getIntent().getExtras();
 
         StrokeManager.init();
-
-        // setupKeyboardListener();
     }
 
     private void setCurrentView(int contentView, VIEWS view) {
@@ -78,25 +78,33 @@ public class TestingActivity extends AppCompatActivity {
     }
 
     private void testCompleted() {
-        if(attempts < MAX_ATTEMPTS && !checkCorrectness()){
-            attempts++;
+        switch (currentView) {
+            case KEYBOARD_TEST -> attempts++;
+            case DIGITALINK_TEST -> {
+                TextView input = findViewById(R.id.userInput);
+                // If user forgot to press "recognize", just ignore button press
+                if (input.getText().toString().equals("") && StrokeManager.hasStrokes()) return;
+            }
+        }
+
+        if (attempts <= MAX_ATTEMPTS && !isInputCorrect()) {
             clearInputs();
             return;
         }
-        recordTest();
+
         showTestScreen();
     }
 
 
-    private boolean checkCorrectness() {
+    private boolean isInputCorrect() {
+        TextView targetInput = findViewById(R.id.targetInput);
+
         switch (currentView) {
             case KEYBOARD_TEST -> {
-                TextView targetInput = findViewById(R.id.targetInput);
                 EditText userInput = findViewById(R.id.userInput);
                 return targetInput.getText().toString().equals(userInput.getText().toString());
             }
             case DIGITALINK_TEST -> {
-                TextView targetInput = findViewById(R.id.targetInput);
                 TextView input = findViewById(R.id.userInput);
                 return targetInput.getText().toString().equals(input.getText().toString());
             }
@@ -106,31 +114,26 @@ public class TestingActivity extends AppCompatActivity {
 
     private void clearInputs() {
         switch (currentView) {
-            case DIGITALINK_TEST:
+            case DIGITALINK_TEST -> {
                 TextView digitalInkUserInput = findViewById(R.id.userInput);
                 DrawView drawView = findViewById(R.id.draw_view);
-                if (digitalInkUserInput != null && drawView != null) {
-                    digitalInkUserInput.setText("");
-                    StrokeManager.clear();
-                    drawView.clear();
-                }
-                break;
-            case KEYBOARD_TEST:
-                if(nonDeletableEditTextWatcher == null) { //From current contentView
-                    EditText inputUser = (EditText) findViewById(R.id.userInput);
-                    nonDeletableEditTextWatcher = new NonDeletableEditTextWatcher(inputUser);
-                }
-                nonDeletableEditTextWatcher.clear(); //Clear input data on every attempt
-                break;
+
+                if (digitalInkUserInput == null || drawView == null) return;
+
+                digitalInkUserInput.setText("");
+                StrokeManager.clear();
+                drawView.clear();
+            }
+            case KEYBOARD_TEST -> {
+                EditText inputUser = findViewById(R.id.userInput);
+                inputUser.setText("");
+            }
         }
     }
 
 
     private void recordTest() {
-
-        TestResult result = currentTest.complete(attempts);
-
-        attempts = 1;
+        TestResult result = currentTest.complete(Math.max(1, attempts));
 
         testResults.add(result);
 
@@ -147,6 +150,10 @@ public class TestingActivity extends AppCompatActivity {
         // Pop next test from the list
         currentTest = allTests.remove(0);
         currentTest.start();
+
+        // Reset attempts
+        attempts = 0;
+
         if (currentTest.type == KEYBOARD) setupKeyboard();
         else setupDigitalInk();
     }
@@ -178,7 +185,7 @@ public class TestingActivity extends AppCompatActivity {
 
     @SuppressLint("ClickableViewAccessibility")
     private void setupDigitalInk() {
-        hideKeyboard(this); //Fix if keyboard still on screen.
+        hideKeyboard(this); // Fix if keyboard still on screen.
 
         setCurrentView(R.layout.activity_testing_digitalink_test, VIEWS.DIGITALINK_TEST);
 
@@ -194,18 +201,22 @@ public class TestingActivity extends AppCompatActivity {
         targetInput.setText(currentTest.referenceText);
         instructions.setText(R.string.test_instructions_digital_ink);
 
-        clearButton.setVisibility(View.INVISIBLE);
-
         StrokeManager.clear();
 
         // Setup clear button
         clearButton.setOnClickListener(view -> {
             drawView.clear();
+            userInput.setText("");
             StrokeManager.clear();
         });
 
         // Setup recognize button
-        recognizeButton.setOnClickListener(view -> StrokeManager.recognize(userInput));
+        recognizeButton.setOnClickListener(view -> {
+            attempts++;
+            StrokeManager.recognize(userInput);
+        });
+
+        userInput.addTextChangedListener(getTextWatcher());
     }
 
     private void setupKeyboard() {
@@ -214,7 +225,6 @@ public class TestingActivity extends AppCompatActivity {
         TextView targetInput = findViewById(R.id.targetInput);
         TextView instructions = findViewById(R.id.testInstructions);
         EditText userInput = findViewById(R.id.userInput);
-        nonDeletableEditTextWatcher = new NonDeletableEditTextWatcher(userInput);//Setup from a new contentView
         targetInput.setText(currentTest.referenceText);
         instructions.setText(R.string.test_instructions_keyboard);
 
@@ -223,18 +233,29 @@ public class TestingActivity extends AppCompatActivity {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 
         // Set keyboard language
-        userInput.setImeHintLocales(new LocaleList(new Locale(getKeyboardLanguage())));
+        userInput.setImeHintLocales(new LocaleList(new Locale(getLanguage(currentTest.language))));
 
         imm.showSoftInput(userInput, InputMethodManager.SHOW_IMPLICIT);
+
+        userInput.addTextChangedListener(getTextWatcher());
     }
 
-    /**
-     * Mapping StrokeManager.LANG to <a href="https://en.wikipedia.org/wiki/IETF_language_tag#List_of_common_primary_language_subtags">BCP 47 codes</a>
-     */
-    private String getKeyboardLanguage() {
-        return switch (currentTest.language) {
-            case ENGLISH -> "en";
-            case CHINESE -> "zh";
+    private TextWatcher getTextWatcher() {
+        return new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (isInputCorrect()) {
+                    recordTest();
+                }
+            }
         };
     }
 
@@ -248,8 +269,14 @@ public class TestingActivity extends AppCompatActivity {
         return new ArrayList<>(List.of(
                 new TestBundle(this, KEYBOARD, test_content_0, LANG.ENGLISH),
                 new TestBundle(this, DIGITALINK, test_content_0, LANG.ENGLISH),
-                new TestBundle(this, KEYBOARD, test_content_1, LANG.CHINESE),
-                new TestBundle(this, DIGITALINK, test_content_1, LANG.CHINESE)
+                new TestBundle(this, KEYBOARD, test_content_1, LANG.GEORGIAN),
+                new TestBundle(this, DIGITALINK, test_content_1, LANG.GEORGIAN),
+                new TestBundle(this, KEYBOARD, test_content_2, LANG.GREEK),
+                new TestBundle(this, DIGITALINK, test_content_2, LANG.GREEK),
+                new TestBundle(this, KEYBOARD, test_content_3, LANG.ARMENIAN),
+                new TestBundle(this, DIGITALINK, test_content_3, LANG.ARMENIAN),
+                new TestBundle(this, KEYBOARD, test_content_4, LANG.UKRAINIAN),
+                new TestBundle(this, DIGITALINK, test_content_4, LANG.UKRAINIAN)
         ));
     }
 

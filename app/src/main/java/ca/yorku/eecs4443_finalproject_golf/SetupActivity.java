@@ -2,6 +2,7 @@ package ca.yorku.eecs4443_finalproject_golf;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.LocaleList;
 import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
@@ -9,6 +10,13 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.Arrays;
+import java.util.Locale;
+
+import digitalink.StrokeManager;
+
+import static digitalink.StrokeManager.getLanguage;
 
 public class SetupActivity extends AppCompatActivity {
 
@@ -29,6 +37,18 @@ public class SetupActivity extends AppCompatActivity {
             btnShowResults.setVisibility(View.GONE);
 
         setupAgeField();
+
+        setupTextFields();
+    }
+
+    private void setupTextFields() {
+        EditText[] fields = new EditText[]{
+                findViewById(R.id.nameField),
+                findViewById(R.id.ageField)
+        };
+        LocaleList localeList = new LocaleList(new Locale(getLanguage(StrokeManager.LANG.ENGLISH)));
+
+        Arrays.stream(fields).forEach(e -> e.setImeHintLocales(localeList));
     }
 
     private void setupAgeField() {
