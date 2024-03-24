@@ -19,6 +19,7 @@ import com.google.mlkit.vision.digitalink.Ink;
 import org.jetbrains.annotations.Contract;
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 import static android.content.ContentValues.TAG;
 
@@ -28,7 +29,9 @@ import static android.content.ContentValues.TAG;
  * Modified to fit project requirements
  */
 public class StrokeManager {
-    private static DigitalInkRecognitionModel model;
+    // private static DigitalInkRecognitionModel model;
+    private static HashMap<LANG, DigitalInkRecognitionModel> models;
+    private static HashMap<LANG, Boolean> downloadedModels;
     private static Ink.Builder inkBuilder = Ink.builder();
     private static Ink.Stroke.Builder strokeBuilder;
 
@@ -52,7 +55,7 @@ public class StrokeManager {
         }
     }
 
-    public static void setModel(LANG lang) {
+    public static DigitalInkRecognitionModel setModel(LANG lang) {
         DigitalInkRecognitionModelIdentifier modelIdentifier = null;
 
         String languageTag = getLanguage(lang);
@@ -65,7 +68,8 @@ public class StrokeManager {
         }
 
         assert modelIdentifier != null;
-        model = DigitalInkRecognitionModel.builder(modelIdentifier).build();
+
+        return DigitalInkRecognitionModel.builder(modelIdentifier).build();
     }
 
     @Contract(pure = true)
@@ -80,23 +84,37 @@ public class StrokeManager {
     }
 
     public static void init() {
+        models = new HashMap<>();
+        downloadedModels = new HashMap<>();
+
         Arrays.stream(LANG.values()).forEach(StrokeManager::download);
     }
 
     public static void download(LANG lang) {
-        setModel(lang);
+        new Thread(() -> {
+            downloadedModels.put(lang, false);
 
-        RemoteModelManager remoteModelManager = RemoteModelManager.getInstance();
+            DigitalInkRecognitionModel model = setModel(lang);
 
-        remoteModelManager
-                .download(model, new DownloadConditions.Builder().build())
-                .addOnSuccessListener(aVoid -> Log.i(TAG, "Model downloaded"))
-                .addOnFailureListener(
-                        e -> Log.e(TAG, "Error while downloading a model: " + e));
+            models.putIfAbsent(lang, model);
+
+            Log.i("DOWNLOADING", lang + " | " + models.get(lang));
+
+            RemoteModelManager remoteModelManager = RemoteModelManager.getInstance();
+
+            remoteModelManager
+                    .download(model, new DownloadConditions.Builder().build())
+                    .addOnSuccessListener(aVoid -> {
+                        Log.i(TAG, "Model downloaded");
+                        downloadedModels.put(lang, true);
+                    })
+                    .addOnFailureListener(
+                            e -> Log.e(TAG, "Error while downloading a model: " + e));
+        }).start();
     }
 
-    public static void recognize(TextView textView) {
-        DigitalInkRecognizer recognizer = DigitalInkRecognition.getClient(DigitalInkRecognizerOptions.builder(model).build());
+    public static void recognize(TextView textView, LANG lang) {
+        DigitalInkRecognizer recognizer = DigitalInkRecognition.getClient(DigitalInkRecognizerOptions.builder(models.get(lang)).build());
 
         Ink ink = inkBuilder.build();
 
@@ -111,6 +129,10 @@ public class StrokeManager {
 
     public static void clear() {
         inkBuilder = Ink.builder();
+    }
+
+    public static boolean allModelsDownloaded() {
+        return Arrays.stream(LANG.values()).allMatch(lang -> downloadedModels.getOrDefault(lang, false));
     }
 
     public enum LANG {

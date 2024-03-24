@@ -59,8 +59,6 @@ public class TestingActivity extends AppCompatActivity {
         allTests = generateTests();
 
         bundle = getIntent().getExtras();
-
-        StrokeManager.init();
     }
 
     private void setCurrentView(int contentView, VIEWS view) {
@@ -79,7 +77,12 @@ public class TestingActivity extends AppCompatActivity {
 
     private void testCompleted() {
         switch (currentView) {
-            case KEYBOARD_TEST -> attempts++;
+            case KEYBOARD_TEST -> {
+                EditText input = findViewById(R.id.userInput);
+                // Debounce when input is cleared
+                if (input.getText().toString().equals("")) return;
+                attempts++;
+            }
             case DIGITALINK_TEST -> {
                 TextView input = findViewById(R.id.userInput);
                 // If user forgot to press "recognize", just ignore button press
@@ -213,7 +216,7 @@ public class TestingActivity extends AppCompatActivity {
         // Setup recognize button
         recognizeButton.setOnClickListener(view -> {
             attempts++;
-            StrokeManager.recognize(userInput);
+            StrokeManager.recognize(userInput, currentTest.language);
         });
 
         userInput.addTextChangedListener(getTextWatcher());
