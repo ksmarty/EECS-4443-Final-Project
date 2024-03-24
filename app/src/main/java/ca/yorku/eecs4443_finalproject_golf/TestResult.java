@@ -45,7 +45,7 @@ public class TestResult {
     @SuppressLint("DefaultLocale")
     @Override
     public String toString() {
-        return String.format("---%nTest Result:%nTime: %d ms%nAttempts: %d%nType: %s%nLanguage: %s", time, attempts, type.toString(), language.toString());
+        return String.format("---%nTest Result:%nTime: %d ms%nAttempts: %d%nType: %s%nLanguage: %s%n", time, attempts, type.toString(), language.toString());
     }
 
     public String toCSV() {
