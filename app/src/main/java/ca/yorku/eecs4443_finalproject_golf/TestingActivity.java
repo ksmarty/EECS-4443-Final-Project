@@ -28,6 +28,10 @@ import digitalink.StrokeManager;
 import digitalink.StrokeManager.LANG;
 
 import static ca.yorku.eecs4443_finalproject_golf.R.string.test_content_0;
+import static ca.yorku.eecs4443_finalproject_golf.R.string.test_content_1;
+import static ca.yorku.eecs4443_finalproject_golf.R.string.test_content_2;
+import static ca.yorku.eecs4443_finalproject_golf.R.string.test_content_3;
+import static ca.yorku.eecs4443_finalproject_golf.R.string.test_content_4;
 import static ca.yorku.eecs4443_finalproject_golf.TestBundle.TYPE.DIGITALINK;
 import static ca.yorku.eecs4443_finalproject_golf.TestBundle.TYPE.KEYBOARD;
 import static digitalink.StrokeManager.getLanguage;
@@ -264,15 +268,15 @@ public class TestingActivity extends AppCompatActivity {
         // TODO add more tests
         return new ArrayList<>(List.of(
                 new TestBundle(this, KEYBOARD, test_content_0, LANG.ENGLISH),
-                new TestBundle(this, DIGITALINK, test_content_0, LANG.ENGLISH)
-                // new TestBundle(this, KEYBOARD, test_content_1, LANG.GEORGIAN),
-                // new TestBundle(this, DIGITALINK, test_content_1, LANG.GEORGIAN),
-                // new TestBundle(this, KEYBOARD, test_content_2, LANG.GREEK),
-                // new TestBundle(this, DIGITALINK, test_content_2, LANG.GREEK),
-                // new TestBundle(this, KEYBOARD, test_content_3, LANG.ARMENIAN),
-                // new TestBundle(this, DIGITALINK, test_content_3, LANG.ARMENIAN),
-                // new TestBundle(this, KEYBOARD, test_content_4, LANG.UKRAINIAN),
-                // new TestBundle(this, DIGITALINK, test_content_4, LANG.UKRAINIAN)
+                new TestBundle(this, DIGITALINK, test_content_0, LANG.ENGLISH),
+                new TestBundle(this, KEYBOARD, test_content_1, LANG.GEORGIAN),
+                new TestBundle(this, DIGITALINK, test_content_1, LANG.GEORGIAN),
+                new TestBundle(this, KEYBOARD, test_content_2, LANG.GREEK),
+                new TestBundle(this, DIGITALINK, test_content_2, LANG.GREEK),
+                new TestBundle(this, KEYBOARD, test_content_3, LANG.ARMENIAN),
+                new TestBundle(this, DIGITALINK, test_content_3, LANG.ARMENIAN),
+                new TestBundle(this, KEYBOARD, test_content_4, LANG.UKRAINIAN),
+                new TestBundle(this, DIGITALINK, test_content_4, LANG.UKRAINIAN)
         ));
     }
 
