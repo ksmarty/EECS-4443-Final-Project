@@ -6,14 +6,19 @@ import android.os.Handler;
 import android.os.LocaleList;
 import android.text.InputType;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.view.inputmethod.InputMethodSubtype;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import digitalink.StrokeManager;
 
@@ -21,6 +26,8 @@ import static digitalink.StrokeManager.allModelsDownloaded;
 import static digitalink.StrokeManager.getLanguage;
 
 public class SetupActivity extends AppCompatActivity {
+
+    boolean missingLanguages;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +65,43 @@ public class SetupActivity extends AppCompatActivity {
         };
 
         handler.postDelayed(runnable, 1000); // Delay of 1 second
+
+        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+
+        List<StrokeManager.LANG> missing = inputMethodManager
+                .getEnabledInputMethodList()
+                .stream()
+                .map(inputMethodInfo -> {
+                    // Iterate over each input method (e.g. Gboard, AOSP Keyboard, ...)
+                    InputMethodSubtype[] subtypes = inputMethodManager
+                            .getEnabledInputMethodSubtypeList(inputMethodInfo, true)
+                            .toArray(new InputMethodSubtype[0]);
+
+                    // Get LANGs that aren't present in locales
+                    return Arrays.stream(StrokeManager.LANG.values())
+                            .filter(lang -> Arrays.stream(subtypes)
+                                    .map(InputMethodSubtype::getLocale)
+                                    .noneMatch(locale -> locale.contains(getLanguage(lang))
+                            ))
+                            .collect(Collectors.toList());
+                })
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+
+        if (missing.isEmpty()) return;
+
+        missingLanguages = true;
+
+        TextView missingLanguagesList = findViewById(R.id.missingLanguagesList);
+        TextView missingLanguagesWarning = findViewById(R.id.missingLanguagesWarning);
+
+        missingLanguagesList.setVisibility(View.VISIBLE);
+        missingLanguagesWarning.setVisibility(View.VISIBLE);
+
+        missingLanguagesList.setText(missing
+                .stream()
+                .map(Enum::toString)
+                .collect(Collectors.joining(", ")));
     }
 
     private void setupTextFields() {
@@ -119,7 +163,7 @@ public class SetupActivity extends AppCompatActivity {
 
     public void doneLoading() {
         Button button = findViewById(R.id.getStartedButton);
-        button.setEnabled(true);
+        button.setEnabled(!missingLanguages);
         button.setText(R.string.get_started);
     }
 }

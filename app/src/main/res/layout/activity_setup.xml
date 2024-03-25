@@ -176,4 +176,30 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/setupInputsContainer" />
 
+    <TextView
+        android:id="@+id/missingLanguagesWarning"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:gravity="center"
+        android:text="@string/missing_languages"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="?attr/colorError"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/getStartedButton" />
+
+    <TextView
+        android:id="@+id/missingLanguagesList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/test_content_0"
+        android:textColor="?android:attr/textColorPrimary"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="@+id/missingLanguagesWarning"
+        app:layout_constraintStart_toStartOf="@+id/missingLanguagesWarning"
+        app:layout_constraintTop_toBottomOf="@+id/missingLanguagesWarning" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
