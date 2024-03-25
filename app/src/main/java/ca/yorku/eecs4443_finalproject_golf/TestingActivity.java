@@ -14,6 +14,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -86,6 +87,7 @@ public class TestingActivity extends AppCompatActivity {
         }
 
         if (attempts <= MAX_ATTEMPTS && !isInputCorrect()) {
+            Toast.makeText(this, getString(R.string.incorrect_answer), Toast.LENGTH_SHORT).show();
             clearInputs();
             return;
         }
@@ -150,18 +152,18 @@ public class TestingActivity extends AppCompatActivity {
         // Save data
         currentSection.writeResults(this);
 
-        if (currentSection.isTest()) {
-            // Show results screen
-            allTestsCompleted();
-        } else {
-            // Switch from tutorial to tests
-            currentSection = generateTests();
-        }
+        if (currentSection.isTest()) return;
 
+        // Switch from tutorial to tests
+        currentSection = generateTests();
     }
 
     private void showTestScreen() {
-
+        if (currentSection.tests.isEmpty() && currentSection.isTest()) {
+            // Show results screen
+            allTestsCompleted();
+            return;
+        }
 
         // Pop next test from the list
         currentTest = currentSection.getNextTest();

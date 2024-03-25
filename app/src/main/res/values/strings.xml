@@ -23,6 +23,7 @@
     <string name="missing_languages">You are missing the following languages:</string>
     <string name="tutorial">Tutorial</string>
     <string name="test">Test</string>
+    <string name="incorrect_answer">Incorrect answer! Try again</string>
     <string-array name="gender">
         <item>Male</item>
         <item>Female</item>
