@@ -116,7 +116,10 @@ public class StrokeManager {
     public static void recognize(TextView textView, LANG lang) {
         DigitalInkRecognitionModel model = models.get(lang);
 
-        if (model == null) return;
+        if (model == null) {
+            Log.i("Strokes", "MODEL IS NULL: " + lang);
+            return;
+        }
 
         DigitalInkRecognizer recognizer = DigitalInkRecognition.getClient(DigitalInkRecognizerOptions.builder(model).build());
 
