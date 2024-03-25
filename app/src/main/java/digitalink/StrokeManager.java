@@ -114,9 +114,15 @@ public class StrokeManager {
     }
 
     public static void recognize(TextView textView, LANG lang) {
-        DigitalInkRecognizer recognizer = DigitalInkRecognition.getClient(DigitalInkRecognizerOptions.builder(models.get(lang)).build());
+        DigitalInkRecognitionModel model = models.get(lang);
+
+        if (model == null) return;
+
+        DigitalInkRecognizer recognizer = DigitalInkRecognition.getClient(DigitalInkRecognizerOptions.builder(model).build());
 
         Ink ink = inkBuilder.build();
+
+        if (!hasStrokes(ink)) return;
 
         recognizer.recognize(ink)
                 .addOnSuccessListener(result -> textView.setText(result.getCandidates().get(0).getText()))
@@ -125,6 +131,9 @@ public class StrokeManager {
 
     public static boolean hasStrokes() {
         return inkBuilder.build().getStrokes().size() > 0;
+    }
+    public static boolean hasStrokes(Ink ink) {
+        return ink.getStrokes().size() > 0;
     }
 
     public static void clear() {

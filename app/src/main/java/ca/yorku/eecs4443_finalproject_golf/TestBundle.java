@@ -9,11 +9,6 @@ import digitalink.StrokeManager.LANG;
 
 public class TestBundle implements Comparable<TestBundle> {
     /**
-     * ID of the bundle
-     */
-    private final UUID ID;
-
-    /**
      * The test type
      */
     TYPE type;
@@ -35,7 +30,26 @@ public class TestBundle implements Comparable<TestBundle> {
 
     LANG language;
 
+    /**
+     * Text to show on the break screen after the test is completed
+     */
+    String breakText;
+
+    /**
+     * ID of the bundle
+     */
+    private UUID ID;
+
     public TestBundle(Context ctx, TYPE type, int referenceText, LANG language) {
+        initialize(ctx, type, referenceText, language);
+    }
+
+    public TestBundle(TestingActivity ctx, TYPE type, int referenceText, LANG language, int breakText) {
+        this.breakText = ctx.getString(breakText);
+        initialize(ctx, type, referenceText, language);
+    }
+
+    private void initialize(Context ctx, TYPE type, int referenceText, LANG language) {
         this.type = type;
         this.referenceText = ctx.getString(referenceText);
         this.language = language;
