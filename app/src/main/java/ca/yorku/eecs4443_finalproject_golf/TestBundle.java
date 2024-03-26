@@ -62,7 +62,7 @@ public class TestBundle implements Comparable<TestBundle> {
     }
 
     public TestResult complete(int attempts) {
-        long completionTime = (System.currentTimeMillis() - startTime);
+        long completionTime = (System.currentTimeMillis() - startTime)/1000;
         long cpuTime = (Debug.threadCpuTimeNanos() - cpuStart) / 1_000_000;
 
         return new TestResult(completionTime, attempts, type, language, cpuTime);

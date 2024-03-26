@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.LocaleList;
 import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.view.inputmethod.InputMethodSubtype;
@@ -73,6 +74,7 @@ public class SetupActivity extends AppCompatActivity {
                 .stream()
                 .map(inputMethodInfo -> {
                     // Iterate over each input method (e.g. Gboard, AOSP Keyboard, ...)
+
                     InputMethodSubtype[] subtypes = inputMethodManager
                             .getEnabledInputMethodSubtypeList(inputMethodInfo, true)
                             .toArray(new InputMethodSubtype[0]);
@@ -163,7 +165,7 @@ public class SetupActivity extends AppCompatActivity {
 
     public void doneLoading() {
         Button button = findViewById(R.id.getStartedButton);
-        button.setEnabled(!missingLanguages);
+        button.setEnabled(true);
         button.setText(R.string.get_started);
     }
 }
