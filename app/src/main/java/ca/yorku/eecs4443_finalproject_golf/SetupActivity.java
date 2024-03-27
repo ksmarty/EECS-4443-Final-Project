@@ -163,7 +163,7 @@ public class SetupActivity extends AppCompatActivity {
 
     public void doneLoading() {
         Button button = findViewById(R.id.getStartedButton);
-        button.setEnabled(!missingLanguages);
+        button.setEnabled(true);
         button.setText(R.string.get_started);
     }
 }
