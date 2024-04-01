@@ -14,6 +14,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.test.espresso.IdlingRegistry;
+import androidx.test.espresso.idling.CountingIdlingResource;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,11 +30,17 @@ import static digitalink.StrokeManager.getLanguage;
 public class SetupActivity extends AppCompatActivity {
 
     boolean missingLanguages;
+    CountingIdlingResource languagesLoading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setup);
+
+        // Make espresso wait until languages are loaded
+        languagesLoading = new CountingIdlingResource("languagesLoading");
+        languagesLoading.increment();
+        IdlingRegistry.getInstance().register(languagesLoading);
 
         // Event listener for "Get Started" button
         findViewById(R.id.getStartedButton).setOnClickListener(this::getStarted);
@@ -52,6 +60,9 @@ public class SetupActivity extends AppCompatActivity {
         StrokeManager.init();
 
         Handler handler = new Handler();
+
+        // TODO REMOVE THIS
+        doneLoading();
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -143,7 +154,7 @@ public class SetupActivity extends AppCompatActivity {
 
         // Ensure age is valid
         if (age < 18 || age > 120) {
-            ageField.setError("Age must be in the range 18~120");
+            ageField.setError(getString(R.string.error_invalid_age));
             isValid = false;
         }
 
@@ -165,5 +176,9 @@ public class SetupActivity extends AppCompatActivity {
         Button button = findViewById(R.id.getStartedButton);
         button.setEnabled(true);
         button.setText(R.string.get_started);
+
+        // Tell espresso to start testing
+        languagesLoading.decrement();
+        IdlingRegistry.getInstance().unregister(languagesLoading);
     }
 }
