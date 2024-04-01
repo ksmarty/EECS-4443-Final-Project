@@ -17,7 +17,7 @@ import static androidx.test.espresso.action.ViewActions.clearText;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 
 @RunWith(AndroidJUnit4.class)
-public class SetupTests {
+public class UiTests {
     @Rule
     public ActivityScenarioRule<SetupActivity> activityRule = new ActivityScenarioRule<>(SetupActivity.class);
     Helper helper;
@@ -35,6 +35,8 @@ public class SetupTests {
         onView(withId(R.id.ageField)).perform(clearText());
 
         helper = new Helper();
+
+        helper.waitUntilLoaded();
     }
 
     @Test
@@ -78,6 +80,52 @@ public class SetupTests {
         helper
                 .clickContinue()
                 .fillInput(R.id.userInput, R.string.test_content_0)
+                .clickContinue()
+                .checkVisible(R.id.testingBreakLayout);
+    }
+
+    @Test
+    public void testEnglishDigitalInk() {
+        testEnglishKeyboard();
+
+        helper
+                .clickContinue()
+
+                // Draw A
+                .drawLine(0, 0, 1, 2)
+                .drawLine(1, 2, 1, -2)
+                .drawLine(0.5, 1, 1, 0)
+
+                // Draw p
+                .drawLine(3, -1, 0, 2)
+                .drawLine(3, 1, 0.5, 0)
+                .drawLine(3.5, 1, 0.5, -0.5)
+                .drawLine(4, 0.5, -0.5, -0.5)
+                .drawLine(3.5, 0, -0.5, 0)
+
+                // Draw p
+                .drawLine(5, -1, 0, 2)
+                .drawLine(5, 1, 0.5, 0)
+                .drawLine(5.5, 1, 0.5, -0.5)
+                .drawLine(6, 0.5, -0.5, -0.5)
+                .drawLine(5.5, 0, -0.5, 0)
+
+                // Draw l
+                .drawLine(7, 0, 0, 2)
+
+                // Draw e
+                .drawLine(8, 0.5, 1, 0)
+                .drawLine(9, 0.5, 0, 0.25)
+                .drawLine(9, 0.75, -0.25, 0.25)
+                .drawLine(8.75, 1, -0.5, 0)
+                .drawLine(8.25, 1, -0.25, -0.25)
+                .drawLine(8, 0.75, 0, -0.5)
+                .drawLine(8, 0.25, 0.25, -0.25)
+                .drawLine(8.25, 0, 0.5, 0)
+                .drawLine(8.75, 0, 0.25, 0.25)
+
+                .clickButton(R.id.recognizeButton)
+                .waitForRecognizer()
                 .clickContinue()
                 .checkVisible(R.id.testingBreakLayout);
     }

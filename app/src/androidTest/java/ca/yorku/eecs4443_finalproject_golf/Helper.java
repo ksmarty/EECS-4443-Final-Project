@@ -1,6 +1,11 @@
 package ca.yorku.eecs4443_finalproject_golf;
 
 import android.content.Context;
+import android.graphics.Rect;
+import android.support.test.uiautomator.By;
+import android.support.test.uiautomator.UiDevice;
+import android.support.test.uiautomator.UiObject2;
+import android.support.test.uiautomator.Until;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -20,12 +25,18 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 
 class Helper {
+    private static String TARGET_PACKAGE;
     Context ctx;
+
+    UiDevice device;
 
     public Helper() {
         this.ctx = ApplicationProvider.getApplicationContext();
+        TARGET_PACKAGE = ctx.getPackageName();
+        device = UiDevice.getInstance(getInstrumentation());
     }
 
     public Helper fillInput(int fieldId, String input) {
@@ -104,6 +115,46 @@ class Helper {
     public Helper checkVisible(int view) {
         onView(withId(view))
                 .check(matches(isDisplayed()));
+
+        return this;
+    }
+
+    public Helper drawLine(double startX, double startY, double offsetX, double offsetY) {
+        Rect bounds = device.findObject(By.res(TARGET_PACKAGE, "draw_view")).getVisibleBounds();
+
+        final int MARGIN = 50;
+        int width = bounds.width() - MARGIN * 2;
+        int height = bounds.height() - MARGIN * 2;
+
+        int normStartX = normalizeToRange(startX, width);
+        int normStartY = normalizeToRange(startY, height);
+        int normOffsetX = normalizeToRange(offsetX, width);
+        int normOffsetY = normalizeToRange(offsetY, height);
+
+        int baseX = MARGIN + bounds.left + normStartX;
+        int baseY = bounds.centerY() - normStartY;
+
+        device.drag(baseX, baseY, baseX + normOffsetX, baseY - normOffsetY, 10);
+
+        return this;
+    }
+
+    private int normalizeToRange(double value, double max) {
+        final int GRID_SIZE = 10;
+        final int CHAR_SIZE = 2;
+
+        double normalizedValue = value / CHAR_SIZE;
+        return (int) (normalizedValue * (max / (GRID_SIZE / CHAR_SIZE)));
+    }
+
+    public void waitUntilLoaded() {
+        UiObject2 getStartedButton = device.findObject(By.res(TARGET_PACKAGE, "getStartedButton"));
+        getStartedButton.wait(Until.enabled(true), 2 * 60 * 1000);
+    }
+
+    public Helper waitForRecognizer() {
+        UiObject2 userInput = device.findObject(By.res(TARGET_PACKAGE, "userInput"));
+        userInput.wait(Until.textNotEquals(""), 3 * 1000);
 
         return this;
     }
