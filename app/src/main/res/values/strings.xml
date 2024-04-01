@@ -6,6 +6,7 @@
     <string name="tutorial_description">You will be given a tutorial of how the two input methods work - Keyboard &amp; DigitalInk - in English\n\nAfter the 2 tutorial tests, you will be given tests in other languages. Don\'t worry, you don\'t need to be multilingual\n\nResponses are not case sensitive! So don\'t worry about capitalization\n\nOnce you have completed a task, press the button in the bottom right corner to proceed\n\nGive it a press to get started!</string>
     <string name="setup_description">Fill out the details and click \"Get Started\" to begin</string>
     <string name="error_invalid_name">Please enter your full name!</string>
+    <string name="error_invalid_age">Age must be in the range 18~120</string>
     <string name="setup_subtitle">EECS 4443 - Final Project</string>
     <string name="clear_button_text">Clear</string>
     <string name="clear_results_button_text">Clear Results</string>
@@ -24,6 +25,7 @@
     <string name="tutorial">Tutorial</string>
     <string name="test">Test</string>
     <string name="incorrect_answer">Incorrect answer! Try again</string>
+    <string name="continue_text">Continue</string>
     <string-array name="gender">
         <item>Male</item>
         <item>Female</item>
