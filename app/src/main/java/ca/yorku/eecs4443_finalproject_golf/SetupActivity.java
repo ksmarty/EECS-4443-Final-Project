@@ -52,6 +52,7 @@ public class SetupActivity extends AppCompatActivity {
         StrokeManager.init();
 
         Handler handler = new Handler();
+
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -143,7 +144,7 @@ public class SetupActivity extends AppCompatActivity {
 
         // Ensure age is valid
         if (age < 18 || age > 120) {
-            ageField.setError("Age must be in the range 18~120");
+            ageField.setError(getString(R.string.error_invalid_age));
             isValid = false;
         }
 
